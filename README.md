@@ -78,6 +78,8 @@ console.log(art.statistics.collisionChanges); // 0
 
 将 `skills/rpg-map-workflow` 文件夹放入你的 Agent 的 skills 目录。Codex 的默认位置是 `~/.codex/skills/`；其他 Agent 请使用其对应的 skill 安装方式。
 
+也可从 [GitHub Release](https://github.com/laid-backprogrammer/rpg-map-skill-sdk/releases) 下载独立 Skill ZIP，解压后保留整个同名文件夹（包括 `LICENSE` 和 `references`）。
+
 给支持 Skill 的 Agent 一个实际请求：
 
 ```text
