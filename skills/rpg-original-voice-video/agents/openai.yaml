@@ -1,0 +1,4 @@
+interface:
+  display_name: "RPG Original Voice Video"
+  short_description: "Proof-focused RPG edits that preserve original voice"
+  default_prompt: "Use $rpg-original-voice-video to edit a technical RPG explainer around my complete recording without rewriting or retiming it."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "RPG Map Workflow"
+  short_description: "Validated RPG layouts, art contracts, and sprite QA"
+  default_prompt: "Use $rpg-map-workflow to build a playable RPG map with a validated blockout, protected routes, and a separate art plan."

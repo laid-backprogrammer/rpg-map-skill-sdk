@@ -1,0 +1,9 @@
+node_modules/
+output/
+*.tgz
+*.log
+.env
+.env.*
+.npmrc
+.DS_Store
+Thumbs.db

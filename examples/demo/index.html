@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>RPG Map SDK | Blockout Inspector</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./style.css">
+    <script src="./app.js" type="module"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>RPG Map SDK</h1>
+      <span class="app-title">Blockout Inspector</span>
+      <span id="sdk-version" class="version"></span>
+    </header>
+    <main>
+      <form id="generator" class="generator">
+        <label class="preset-control">Map
+          <select id="preset" name="preset">
+            <optgroup label="Towns">
+              <option value="organic">Organic town</option>
+              <option value="symmetric">Symmetric town</option>
+              <option value="grid">Grid town</option>
+            </optgroup>
+            <optgroup label="Interiors">
+              <option value="cottage">Cottage</option>
+              <option value="inn">Inn</option>
+              <option value="workshop">Workshop</option>
+            </optgroup>
+          </select>
+        </label>
+        <label class="seed-control">Seed
+          <input id="seed" name="seed" value="1042" maxlength="128" required autocomplete="off">
+        </label>
+        <label class="symmetry-control">Interior symmetry
+          <select id="symmetry" name="symmetry" disabled>
+            <option value="none">None</option>
+            <option value="bilateral">Bilateral</option>
+            <option value="quadrilateral">Quadrilateral</option>
+          </select>
+        </label>
+        <button id="generate" class="primary" type="submit">Generate</button>
+      </form>
+      <div id="error" class="error" role="alert" hidden></div>
+      <div class="workspace">
+        <section class="map-area" aria-label="Map data preview">
+          <div class="map-toolbar">
+            <label>View
+              <select id="view">
+                <option value="terrain">Terrain</option>
+                <option value="navigation">Navigation</option>
+                <option value="road">Reserved roads</option>
+                <option value="protected">Art protection</option>
+                <optgroup label="Art fields">
+                  <option value="roadDistance">Road distance</option>
+                  <option value="waterDistance">Water distance</option>
+                  <option value="wallDistance">Wall distance</option>
+                  <option value="shade">Shade</option>
+                  <option value="traffic">Traffic</option>
+                  <option value="moisture">Moisture</option>
+                </optgroup>
+              </select>
+            </label>
+            <label class="check"><input id="colliders" type="checkbox" checked> Physical boxes</label>
+            <label class="check"><input id="rectangle" type="checkbox" checked> Max rectangle</label>
+            <label class="check"><input id="decorations" type="checkbox"> Art points</label>
+            <label class="check"><input id="grid-lines" type="checkbox"> Grid</label>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="map" tabindex="0" aria-label="Generated blockout map"></canvas>
+          </div>
+          <div class="map-footer">
+            <div class="legend" aria-label="Map legend">
+              <span><i class="swatch spawn"></i>Spawn</span>
+              <span><i class="swatch portal"></i>Exit</span>
+              <span><i class="swatch collider"></i>Solid</span>
+              <span><i class="swatch rectangle"></i>Max rectangle</span>
+              <span><i class="swatch route"></i>A* route</span>
+            </div>
+            <output id="coordinates">No target</output>
+          </div>
+        </section>
+        <aside class="inspector" aria-label="Validation report">
+          <div class="report-heading"><h2>Validation</h2><output id="result" class="result">Pending</output></div>
+          <dl id="metrics" class="metrics"></dl>
+          <h3>Portals</h3>
+          <div id="portals" class="portal-list"></div>
+          <h3>Selected Route</h3>
+          <p id="route-status" class="route-status" role="status">No target</p>
+          <label class="target-label" for="target">Landmark or portal</label>
+          <select id="target"><option value="">Select target</option></select>
+          <div id="issues" class="issues" hidden></div>
+          <h3>Art Plan</h3>
+          <dl id="art-metrics" class="metrics"></dl>
+          <div class="exports">
+            <button id="download-map" type="button" disabled>Export map JSON</button>
+            <button id="download-art" type="button" disabled>Export art JSON</button>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </body>
+</html>

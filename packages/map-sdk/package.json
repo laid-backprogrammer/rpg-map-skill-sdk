@@ -1,0 +1,40 @@
+{
+  "name": "@mossbrook/map-sdk",
+  "version": "0.3.0",
+  "description": "Deterministic, connectivity-verified 2D towns and building interiors.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "index.d.ts",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "sideEffects": false,
+  "license": "MIT",
+  "author": "laid-backprogrammer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/laid-backprogrammer/rpg-map-skill-sdk.git",
+    "directory": "packages/map-sdk"
+  },
+  "homepage": "https://github.com/laid-backprogrammer/rpg-map-skill-sdk",
+  "bugs": {
+    "url": "https://github.com/laid-backprogrammer/rpg-map-skill-sdk/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "pathfinding": "^0.4.18",
+    "poisson-disk-sampling": "^2.3.1"
+  }
+}
