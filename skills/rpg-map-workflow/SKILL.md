@@ -30,6 +30,7 @@ Read [references/art-and-animation.md](references/art-and-animation.md) before c
 - Ground artwork must not invent visually solid walls, trunks, deep water, doors, stairs, or tall objects that contradict the physical map. Decorative patches can vary inside approved material regions.
 - Use semantic groups and variable-distance Poisson sampling for natural dressing: group anchors first, members second, with protected roads/door approaches excluded. Describe this as an external extension for generic maps; the shipped specialized cluster preset is limited to its documented scene contract.
 - Keep collision footprints, sprite visual bounds, image pixel anchors, depth-sort feet, and optional occluder parts separate. Trees may overlap visually while their roots cannot block a reserved path.
+- Heighted props may opt into `spriteStacks`: horizontal slices with spacing, pivot, and world height that cite the existing footprint. Sort the whole stack by the world foot. Do not turn stack height, canopy, or eaves into collision. Props without a stack stay single sprites.
 - Render: ground -> ground decals/contact shadows -> foot-depth-sorted entities -> conditional roof/canopy foreground -> effects. Do not put every tree canopy unconditionally above every actor; test front/back and partial transparency.
 
 ## Coordinate Agents And Close The Loop

@@ -36,6 +36,8 @@ export interface Entity extends Rectangle {
   sprite?: string;
   visual?: { offsetX: number; offsetY: number; width: number; height: number };
   anchor?: Position;
+  /** Opt-in faux-3D slices. Collision and navigation ignore this field. */
+  spriteStack?: SpriteStackInput;
   approach?: TilePoint;
   door?: TilePoint & { side?: Side };
   doors?: Array<TilePoint & { side?: Side }>;
@@ -218,7 +220,60 @@ export interface ArtMap extends NavigationMap {
   interactables?: Array<TilePoint & { id: string; kind: string; approach?: TilePoint }>;
   buildings?: Building[];
 }
-export interface ArtOptions { seed?: Seed; tileSize?: number; preset?: "fangcun" | "generic" | "plain" }
+export interface ArtOptions {
+  seed?: Seed;
+  tileSize?: number;
+  preset?: "fangcun" | "generic" | "plain";
+  /** Opt-in stacks. Each footprintId must already exist. Omitted props stay single sprites. */
+  spriteStacks?: Array<SpriteStackInput & { footprintId: string }>;
+}
+export interface SpriteStackSliceInput {
+  /** Gap in map units above the previous slice. The ground slice stays at elevation 0. */
+  spacing?: number;
+  sprite?: string;
+  visual?: { offsetX: number; offsetY: number; width: number; height: number };
+}
+/** Description of horizontal slices. World height is visual; the footprint is not resized. */
+export interface SpriteStackInput {
+  /** Existing entity id. Optional when the object is stored on that entity. */
+  footprintId?: string;
+  /** At least 2 and at most 64, including the ground slice. */
+  sliceCount: number;
+  /** Uniform gap in map units. Omit when height or per-slice spacing defines the gaps. */
+  spacing?: number;
+  /** Visual column height in map units, equal to the top slice elevation. */
+  height?: number;
+  /** Normalized inside the ground footprint. (0.5, 1) is the south-center foot. */
+  pivot?: Position;
+  sprite?: string;
+  slices?: SpriteStackSliceInput[];
+}
+export interface SpriteStackSlice {
+  index: number;
+  elevation: number;
+  spacing: number;
+  sprite: string;
+  visual?: { offsetX: number; offsetY: number; width: number; height: number };
+}
+export interface SpriteStack {
+  id: string;
+  footprintId: string;
+  sprite: string;
+  sliceCount: number;
+  spacingMode: "uniform" | "per-slice";
+  /** Present when every upper slice uses the same gap. */
+  spacing?: number;
+  height: number;
+  pivot: Position;
+  /** World foot copied from the ground footprint and pivot. */
+  foot: Position;
+  /** Same value as foot.y. Engines sort the whole stack here, not per slice. */
+  sortDepth: number;
+  sortMode: "world-foot-y";
+  footprint: Rectangle;
+  collision: "footprint-only";
+  slices: SpriteStackSlice[];
+}
 export type GroundDecalKind = "foundation-dirt" | "moss" | "wear" | "crack" | "root-soil" | "leaf-litter" | "shore-wet";
 export interface GroundDecal extends Rectangle { id: string; kind: GroundDecalKind; alpha: number; parentId?: string }
 export interface ContactShadow extends Rectangle { id: string; kind: "soft"; alpha: number; parentId: string }
@@ -242,7 +297,12 @@ export interface ArtPlan {
   fields: { roadDistance: number[][]; waterDistance: number[][]; wallDistance: number[][]; shade: number[][]; traffic: number[][]; moisture: number[][] };
   semanticZones: Array<Rectangle & { id: string; kind: string; parentId?: string }>;
   groups: ArtGroup[]; groundDecals: GroundDecal[]; contactShadows: ContactShadow[]; decorations: ArtDecoration[];
-  statistics: { decorationCount: number; groupCount: number; decalCount: number; shadowCount: number; protectedCellCount: number; collisionChanges: 0; sampler: string; transitionRule: string };
+  /** Empty unless a prop opts in. Stack height is not a collider. */
+  spriteStacks: SpriteStack[];
+  statistics: {
+    decorationCount: number; groupCount: number; decalCount: number; shadowCount: number;
+    protectedCellCount: number; spriteStackCount: number; collisionChanges: 0; sampler: string; transitionRule: string;
+  };
 }
 /** Produces render-only art data without mutating the physical map. */
 export function createArtPlan(map: ArtMap, options?: ArtOptions): ArtPlan;

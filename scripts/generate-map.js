@@ -29,7 +29,8 @@ Room: --kind interior --template cottage|inn|workshop
       --corridor-width N --furniture-density 0..1
 Files: --out MAP.json --art-out ART.json --preset generic|plain|fangcun
 With no --out the complete map JSON is written to stdout.
-Organic is fixed at 48x36 with five houses; other layouts are configurable.`);
+Organic is fixed at 48x36 with five houses; other layouts are configurable.
+The beginner-village example is \`npm run examples\`, not a separate layout.`);
   } else {
     if (!["town", "interior"].includes(values.kind))
       throw new RangeError("kind must be town or interior.");

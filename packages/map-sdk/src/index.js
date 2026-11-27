@@ -24,7 +24,7 @@ export {
   validateMap,
 } from "./core.js";
 export { createArtPlan };
-export const SDK_VERSION = "0.3.0";
+export const SDK_VERSION = "0.4.0";
 
 export class MapValidationError extends Error {
   constructor(report) {

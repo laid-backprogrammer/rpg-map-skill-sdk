@@ -35,5 +35,8 @@ server.on('error', (error) => {
   console.error(error.code === 'EADDRINUSE' ? `Port ${port} is occupied. Choose another port with --port.` : error.message);
   process.exitCode = 1;
 });
-server.listen(port, '127.0.0.1', () => console.log(`Blockout Inspector: http://127.0.0.1:${port}/`));
+server.listen(port, '127.0.0.1', () => {
+  console.log(`Blockout Inspector: http://127.0.0.1:${port}/`);
+  console.log(`HD-2D village: http://127.0.0.1:${port}/scene.html`);
+});
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => server.close());

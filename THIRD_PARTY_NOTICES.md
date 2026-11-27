@@ -11,6 +11,7 @@ retain their own licenses; the project license does not replace them.
 | heap (transitive) | 0.2.5 | PSF | https://github.com/qiao/heap.js |
 | poisson-disk-sampling | 2.3.1 | MIT | https://github.com/kchapelier/poisson-disk-sampling |
 | moore (transitive) | 1.0.0 | MIT | https://github.com/hughsk/moore |
+| three (demo preview only) | 0.170.0 | MIT | https://github.com/mrdoob/three.js |
 
 Dependencies are installed through npm; their source is not vendored in this
 repository. Bundled browser-demo output contains dependency code and is covered
@@ -28,6 +29,8 @@ project and are not relicensed as MIT. Obtain them from their official sources
 and follow their terms. The skills describe integration behavior; they do not
 copy the official skills or runtime code.
 
-No recorded voice, footage, commercial fonts, reference screenshots, AI-generated
-game artwork, or third-party sound library is included. The layout comparison
-image is generated from the SDK's own geometry, not from the private game.
+No recorded voice, footage, commercial fonts, or third-party sound library is
+included. The layout comparison image is generated from the SDK's own geometry.
+`examples/beginner-village/assets` holds painted example slices for the HD-2D
+village preview. Those images are demo art, not part of the `@mossbrook/map-sdk`
+package.

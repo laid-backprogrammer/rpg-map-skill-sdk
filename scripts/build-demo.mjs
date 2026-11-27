@@ -1,5 +1,5 @@
 import { build, stop } from 'esbuild';
-import { mkdir, readFile, writeFile, copyFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, copyFile, cp } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -13,6 +13,7 @@ async function dependencyNotices() {
     ['heap', 'README.md', true],
     ['poisson-disk-sampling', 'LICENSE', false],
     ['moore', 'LICENSE.md', false],
+    ['three', 'LICENSE', false],
   ];
   for (const [name, filename, inReadme] of packages) {
     const text = (await readFile(join(root, 'node_modules', name, filename), 'utf8')).replace(/\r\n/g, '\n');
@@ -31,8 +32,11 @@ export async function buildDemo() {
   try {
     await build({
       absWorkingDir: root,
-      entryPoints: ['examples/demo/app.js'],
-      outfile: join(output, 'bundle.js'),
+      entryPoints: {
+        bundle: 'examples/demo/app.js',
+        scene: 'examples/demo/scene.js',
+      },
+      outdir: output,
       bundle: true,
       format: 'esm',
       platform: 'browser',
@@ -48,7 +52,12 @@ export async function buildDemo() {
   const source = await readFile(join(root, 'examples/demo/index.html'), 'utf8');
   if (!source.includes('src="./app.js"')) throw new Error('Demo entry script was not found in index.html.');
   await writeFile(join(output, 'index.html'), source.replace('src="./app.js"', 'src="./bundle.js"'));
+  const scene = await readFile(join(root, 'examples/demo/scene.html'), 'utf8');
+  if (!scene.includes('src="./scene.js"')) throw new Error('HD-2D scene script was not found.');
+  await writeFile(join(output, 'scene.html'), scene);
   await copyFile(join(root, 'examples/demo/style.css'), join(output, 'style.css'));
+  await copyFile(join(root, 'examples/demo/scene.css'), join(output, 'scene.css'));
+  await cp(join(root, 'examples/beginner-village/assets'), join(output, 'assets'), { recursive: true });
   await writeFile(join(output, 'THIRD_PARTY_LICENSES.txt'), await dependencyNotices());
   await copyFile(join(root, 'THIRD_PARTY_NOTICES.md'), join(output, 'THIRD_PARTY_NOTICES.md'));
   console.log('Demo built: output/demo/index.html');

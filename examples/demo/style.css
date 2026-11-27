@@ -22,7 +22,9 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-w
 .app-header { min-height: 62px; display: flex; align-items: center; gap: 18px; padding: 14px 24px; border-bottom: 1px solid var(--border); }
 h1 { margin: 0; font-size: 19px; font-weight: 700; }
 .app-title { font-size: 14px; color: var(--muted); border-left: 1px solid #bfc7cf; padding-left: 18px; }
-.version { margin-left: auto; color: var(--muted); font-size: 12px; }
+.scene-link { margin-left: auto; color: white; background: var(--accent); border-color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; }
+.scene-link:hover { background: #104f40; color: white; }
+.version { color: var(--muted); font-size: 12px; }
 main { max-width: 1520px; margin: auto; padding: 0 24px 24px; }
 .generator { display: grid; grid-template-columns: minmax(160px, 250px) minmax(140px, 220px) minmax(150px, 200px) auto; align-items: end; justify-content: start; gap: 12px; padding: 18px 0; border-bottom: 1px solid var(--border); }
 .primary { background: var(--accent); color: white; border-color: var(--accent); min-width: 103px; }
@@ -46,8 +48,15 @@ canvas { display: block; width: 100%; touch-action: manipulation; cursor: crossh
 .collider { background: #a7654a; }
 .rectangle { border: 2px solid #b32370; }
 .route { background: #1462ca; }
+.stack { background: #2f7a45; border-radius: 50%; }
+.tilt { flex-direction: row; align-items: center; gap: 8px; }
+.tilt input { width: 108px; min-height: 0; padding: 0; accent-color: var(--accent); }
 output { font-variant-numeric: tabular-nums; }
 .inspector { border-left: 1px solid var(--border); padding: 23px 0 0 22px; min-width: 0; }
+.story h3 { margin-top: 0; }
+.story p, .story li { margin: 0; font-size: 12px; font-weight: 400; color: #252c34; }
+.story ol { margin: 8px 0 18px; padding-left: 18px; display: grid; gap: 8px; }
+.story .beat-zh { display: block; margin-top: 2px; color: var(--muted); }
 .report-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 h2 { font-size: 15px; margin: 0; }
 h3 { font-size: 12px; margin: 22px 0 9px; color: #54606c; font-weight: 700; }

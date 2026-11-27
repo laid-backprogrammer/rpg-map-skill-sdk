@@ -1,11 +1,13 @@
 {
   "name": "rpg-map-skill-sdk",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Blockout-first RPG map workflow, agent skills, and a deterministic map SDK.",
   "type": "module",
   "license": "MIT",
-  "workspaces": ["packages/map-sdk"],
+  "workspaces": [
+    "packages/map-sdk"
+  ],
   "scripts": {
     "test": "node --test",
     "check:types": "tsc --project tsconfig.json",
@@ -21,7 +23,12 @@
   },
   "devDependencies": {
     "esbuild": "0.28.2",
+    "jpeg-js": "^0.4.4",
+    "pngjs": "^7.0.0",
+    "three": "^0.170.0",
     "typescript": "7.0.2"
   },
-  "engines": { "node": ">=22" }
+  "engines": {
+    "node": ">=22"
+  }
 }

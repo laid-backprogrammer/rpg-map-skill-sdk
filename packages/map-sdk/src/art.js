@@ -250,9 +250,161 @@ function surfaceDetails(map, plan, random) {
   }
 }
 
+const STACK_LIMIT = 64;
+const STACK_EPSILON = 1e-8;
+
+function isUnitPoint(point) {
+  return Boolean(point) && typeof point === 'object' && !Array.isArray(point) &&
+    Number.isFinite(point.x) && Number.isFinite(point.y) &&
+    point.x >= 0 && point.x <= 1 && point.y >= 0 && point.y <= 1;
+}
+
+function stackSprite(value, fallback, label) {
+  const sprite = value ?? fallback;
+  if (typeof sprite !== 'string' || sprite.length === 0)
+    throw new TypeError(`${label} must be a non-empty string.`);
+  return sprite;
+}
+
+function stackVisual(visual) {
+  if (visual === undefined) return undefined;
+  if (!visual || typeof visual !== 'object' || Array.isArray(visual))
+    throw new TypeError('Sprite stack visual must be an object.');
+  const copy = {};
+  for (const key of ['offsetX', 'offsetY', 'width', 'height']) {
+    if (!Number.isFinite(visual[key])) throw new RangeError(`Sprite stack visual ${key} must be finite.`);
+    copy[key] = visual[key];
+  }
+  if (copy.width <= 0 || copy.height <= 0)
+    throw new RangeError('Sprite stack visual width and height must be positive.');
+  return copy;
+}
+
+function entityForStack(map, id) {
+  if (typeof id !== 'string' || id.length === 0)
+    throw new TypeError('Sprite stacks require a footprintId string.');
+  const matches = (map.entities ?? []).filter((entity) => entity.id === id);
+  if (matches.length === 0) throw new TypeError(`Sprite stack footprint not found: ${id}.`);
+  if (matches.length > 1) throw new TypeError(`Sprite stack footprint id is not unique: ${id}.`);
+  return matches[0];
+}
+
+function stackElevations(entry, sliceCount, sprite) {
+  if (entry.slices === undefined) {
+    const gap = entry.spacing ?? (entry.height === undefined ? undefined : entry.height / (sliceCount - 1));
+    if (gap === undefined) throw new RangeError('Sprite stacks need spacing, height, or per-slice spacing.');
+    if (!Number.isFinite(gap) || gap <= 0)
+      throw new RangeError('Sprite stack spacing must be a positive finite number.');
+    return Array.from({ length: sliceCount }, (_, index) => ({
+      index,
+      elevation: index === sliceCount - 1 && entry.spacing === undefined ? entry.height : gap * index,
+      spacing: index === 0 ? 0 : gap,
+      sprite,
+    }));
+  }
+  if (!Array.isArray(entry.slices) || entry.slices.length !== sliceCount)
+    throw new RangeError('Sprite stack slices must be an array matching sliceCount.');
+  let elevation = 0;
+  return entry.slices.map((slice, index) => {
+    if (!slice || typeof slice !== 'object' || Array.isArray(slice))
+      throw new TypeError('Each sprite stack slice must be an object.');
+    let gap = 0;
+    if (index === 0) {
+      if (slice.spacing !== undefined && slice.spacing !== 0)
+        throw new RangeError('The ground slice spacing must be 0 or omitted.');
+    } else {
+      const gapSource = slice.spacing ?? entry.spacing;
+      if (gapSource === undefined)
+        throw new RangeError('Each upper slice needs spacing, or the stack needs uniform spacing.');
+      if (!Number.isFinite(gapSource) || gapSource <= 0)
+        throw new RangeError('Slice spacing must be a positive finite number.');
+      gap = gapSource;
+    }
+    elevation += gap;
+    const visual = stackVisual(slice.visual);
+    return {
+      index, elevation, spacing: gap,
+      sprite: stackSprite(slice.sprite, sprite, 'Slice sprite'),
+      ...(visual ? { visual } : {}),
+    };
+  });
+}
+
+// Render metadata only. The entity footprint stays the collision body.
+function compileSpriteStack(map, entry) {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry))
+    throw new TypeError('Each sprite stack must be an object.');
+  const entity = entityForStack(map, entry.footprintId);
+  const sliceCount = entry.sliceCount;
+  if (!Number.isInteger(sliceCount) || sliceCount < 2 || sliceCount > STACK_LIMIT)
+    throw new RangeError(`Sprite stack sliceCount must be an integer from 2 to ${STACK_LIMIT}.`);
+  const pivot = entry.pivot === undefined
+    ? (isUnitPoint(entity.anchor) ? { x: entity.anchor.x, y: entity.anchor.y } : { x: 0.5, y: 1 })
+    : entry.pivot;
+  if (!isUnitPoint(pivot))
+    throw new RangeError('Sprite stack pivot must be a normalized point inside the ground footprint.');
+  const sprite = stackSprite(entry.sprite, entity.sprite ?? entity.type, 'Sprite stack sprite');
+  if (entry.spacing !== undefined && (!Number.isFinite(entry.spacing) || entry.spacing <= 0))
+    throw new RangeError('Sprite stack spacing must be a positive finite number.');
+  if (entry.height !== undefined && (!Number.isFinite(entry.height) || entry.height <= 0))
+    throw new RangeError('Sprite stack height must be a positive finite number.');
+  const slices = stackElevations(entry, sliceCount, sprite);
+  let height = slices.at(-1).elevation;
+  if (!(height > 0)) throw new RangeError('Sprite stack height must be positive.');
+  if (entry.height !== undefined) {
+    if (Math.abs(entry.height - height) > STACK_EPSILON)
+      throw new RangeError('Sprite stack height must equal the top slice elevation.');
+    slices.at(-1).elevation = entry.height;
+    height = entry.height;
+  }
+  const gaps = slices.slice(1).map((slice) => slice.spacing);
+  const uniform = gaps.every((gap) => gap === gaps[0]);
+  const footprint = { x: entity.x, y: entity.y, width: entity.width, height: entity.height };
+  const foot = {
+    x: footprint.x + footprint.width * pivot.x,
+    y: footprint.y + footprint.height * pivot.y,
+  };
+  return {
+    id: `stack-${entity.id}`, footprintId: entity.id, sprite, sliceCount,
+    spacingMode: uniform ? 'uniform' : 'per-slice',
+    ...(uniform ? { spacing: gaps[0] } : {}),
+    height, pivot: { x: pivot.x, y: pivot.y }, foot, sortDepth: foot.y, sortMode: 'world-foot-y',
+    footprint, collision: 'footprint-only', slices,
+  };
+}
+
+function compileSpriteStacks(map, options) {
+  if (options.spriteStacks !== undefined && !Array.isArray(options.spriteStacks))
+    throw new TypeError('spriteStacks must be an array.');
+  const claimed = new Set();
+  const pending = [];
+  for (const entry of options.spriteStacks ?? []) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry))
+      throw new TypeError('Each sprite stack must be an object.');
+    if (claimed.has(entry.footprintId))
+      throw new TypeError(`Duplicate sprite stack for ${entry.footprintId}.`);
+    claimed.add(entry.footprintId);
+    pending.push(entry);
+  }
+  for (const entity of map.entities ?? []) {
+    if (entity.spriteStack === undefined) continue;
+    if (claimed.has(entity.id))
+      throw new TypeError(`Sprite stack for ${entity.id} is declared both on the entity and in options.`);
+    const hint = entity.spriteStack;
+    if (!hint || typeof hint !== 'object' || Array.isArray(hint))
+      throw new TypeError(`Entity ${entity.id ?? '(missing id)'} spriteStack must be an object.`);
+    if (hint.footprintId !== undefined && hint.footprintId !== entity.id)
+      throw new TypeError(`Entity ${entity.id} spriteStack footprintId must match the entity.`);
+    claimed.add(entity.id);
+    pending.push({ ...hint, footprintId: entity.id });
+  }
+  return pending.map((entry) => compileSpriteStack(map, entry));
+}
+
 /** A render-only plan; no world entity, route, collision, or story state is edited. */
 export function createArtPlan(map, options = {}) {
   const settings = validateInput(map, options);
+  const spriteStacks = compileSpriteStacks(map, options);
   const random = seededRandom(`${settings.seed}:art-v1`);
   const variation = noiseField(map.width, map.height, random);
   const roadDistance = distanceField(map, (x, y) => Boolean(map.roadMask?.[y]?.[x]) || [TILE.PATH, TILE.BRIDGE, TILE.FLOOR].includes(map.tiles[y][x]));
@@ -265,12 +417,13 @@ export function createArtPlan(map, options = {}) {
   const plan = { version: '1.0', ...settings, width: map.width, height: map.height,
     materials: map.tiles.map((row) => [...row]), fields: { roadDistance, waterDistance, wallDistance, shade, traffic, moisture },
     protected: protectedCells, transitions: blobMasks(map), semanticZones: semanticZones(map),
-    groundDecals: [], contactShadows: [], decorations: [], groups: [], statistics: {} };
+    groundDecals: [], contactShadows: [], decorations: [], groups: [], spriteStacks, statistics: {} };
   decorationsFor(map, plan, random, variation);
   surfaceDetails(map, plan, random);
   plan.statistics = { decorationCount: plan.decorations.length, groupCount: plan.groups.length,
     decalCount: plan.groundDecals.length, shadowCount: plan.contactShadows.length,
     protectedCellCount: protectedCells.reduce((count, row) => count + row.filter(Boolean).length, 0),
+    spriteStackCount: plan.spriteStacks.length,
     collisionChanges: 0, sampler: 'poisson-disk-sampling', transitionRule: 'blob-47' };
   return plan;
 }

@@ -10,6 +10,7 @@
 | 连续世界脚点 | 地图格单位，由角色/实体确定 | 放置、深度排序 |
 | 图片锚点 | 未裁切画布的像素坐标 | 防止图片或帧漂移 |
 | 图片/遮挡范围 | 图片像素或明确换算的地图单位 | 显示、屋檐/树冠遮挡，不自动参与碰撞 |
+| 水平切片堆叠 | 地图格单位的层数、间距、枢轴和世界高度，并引用已有占地 | 把若干水平切片错开，形成伪三维；不参与碰撞 |
 
 地图格 `(x,y)` 的中心是 `(x+0.5,y+0.5)`。SDK 的 `visual.offsetX/offsetY/width/height` 使用地图单位；下面 manifest 的 `anchorPx` 使用像素。SDK `Entity.anchor` 不应直接接收 `anchorPx`。
 
@@ -75,6 +76,50 @@ sortDepth = worldFootUnits.y
 ```
 
 `footprintRef` 指向现有地图实体，不表示允许图片自行生成新碰撞。透明度策略由引擎实现；上面的 `0.45` 是可调的表现参数，不是 SDK 自动执行的功能。前景拆分或遮罩需要实际资源，不能仅填一个文件名就宣布遮挡完成。
+
+## 水平切片堆叠
+
+树、塔、石、碑、屋檐和类似高物可以画成一叠水平切片，让斜俯视角看起来有体积。这是可选的绘制描述。没有堆叠数据的实体仍是一张精灵图。切片的世界高度、树冠和屋檐都不是碰撞体。
+
+SDK 的 `createArtPlan` 把同样的信息写进 `spriteStacks`。计划版本仍是 `1.0`；这个数组总是存在，没有堆叠时为空。它不修改 `tiles`、实体占地、`walkable` 或寻路，`statistics.collisionChanges` 仍是 `0`。
+
+调用方用下面任一方式声明，不能对同一个实体声明两次：
+
+- `createArtPlan(map, { spriteStacks: [...] })`，每项带已有实体的 `footprintId`
+- 实体上的 `spriteStack`。碰撞代码不读这个字段。省略时该实体保持单图
+
+`sliceCount` 含地面层，是 `2` 到 `64` 的整数。间距可以是统一的 `spacing`，也可以在 `slices` 里逐层给出；只给 `height` 时按层数均分。`height` 是脚平面到顶层的地图格高度，必须等于顶层标高。`pivot` 是占地矩形内的归一化点，`(0.5, 1)` 表示南侧中心脚点；省略时沿用实体上落在 `0..1` 内的 `anchor`，否则用 `(0.5, 1)`。
+
+输出的每一项复制二维占地，并给出世界脚点。整个叠层共用 `sortMode: "world-foot-y"`，`sortDepth` 就是脚点的 `y`。引擎不要按每一层的高度改排序，也不要把层高写回 `entity.height`。`collision` 固定为 `"footprint-only"`。
+
+```json
+{
+  "id": "pine-stack",
+  "role": "entity",
+  "file": "assets/pine-slices.png",
+  "canvasPx": [64, 64],
+  "sliceCount": 6,
+  "alpha": "straight",
+  "anchorPx": [32, 56],
+  "drawScale": 1,
+  "footprintRef": "tree-01",
+  "sortMode": "world-foot-y",
+  "spriteStack": {
+    "sliceCount": 6,
+    "spacing": 0.34,
+    "height": 1.7,
+    "pivot": [0.5, 1],
+    "collision": "footprint-only"
+  },
+  "provenance": { "kind": "generated", "license": "REVIEW_REQUIRED" }
+}
+```
+
+这里的 `spacing` 和 `height` 是地图格，`pivot` 是占地内的归一化坐标，`anchorPx` 仍是每一层未裁切画布上的像素锚点。层与层可以共用一张切片图，也可以逐层换 `sprite`。引擎若要在屏幕上把层错开，用自己的投影把 `elevation` 换成像素；SDK 不计算这个偏移，也不做遮挡。
+
+水井、石碑这类不等距层可以写成 `slices: [{}, { "spacing": 0.42 }, { "spacing": 0.38 }]`。地面层的间距必须是 `0` 或省略。公告牌、角色和本就不需要高度的道具不要填堆叠。
+
+可运行的例子是 [新手村](../examples/beginner-village/README.md)：它复用 `organic` 布局，只给三棵树、水井和旅店写了堆叠。告示牌、村长和路牌仍是单图。北出口的路和门口净空与堆叠之前相同。
 
 大建筑可拆为基础/墙体、屋檐前景和门口交互三部分。树可拆根部实体与树冠遮罩。接触阴影和树根土迹由地面层绘制，不必和树冠绑定在一张大矩形图中。独立素材必须采用同一视角、光照和像素密度，不能让写实大树与小比例人物仅靠缩放凑在一起。
 
