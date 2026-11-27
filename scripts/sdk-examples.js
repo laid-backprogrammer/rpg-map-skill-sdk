@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { createMapSDK } from "@mossbrook/map-sdk";
+import { createArtPlan, createMapSDK } from "@mossbrook/map-sdk";
+import { artOptionsFor, storyFor } from "../examples/beginner-village/village.js";
 
 const sdk = createMapSDK({ seed: 1042 });
 const directory = new URL("../output/sdk-examples/", import.meta.url);
@@ -30,3 +31,25 @@ for (const template of ["cottage", "inn", "workshop"]) {
     `${template}: ${interior.rooms.length} rooms, ${interior.doors.length} doors, ${interior.report.reachablePercent}% reachable`,
   );
 }
+const village = sdk.generateTown({ layout: "organic" });
+const villageArt = createArtPlan(village, artOptionsFor(village));
+const story = {
+  ...storyFor(village),
+  mapFile: "beginner-village.json",
+  artFile: "beginner-village-art.json",
+  collisionChanges: villageArt.statistics.collisionChanges,
+  stackedFootprints: villageArt.spriteStacks.map((stack) => ({
+    footprintId: stack.footprintId,
+    sprite: stack.sprite,
+    sliceCount: stack.sliceCount,
+    spacingMode: stack.spacingMode,
+    height: stack.height,
+    collision: stack.collision,
+  })),
+};
+await writeFile(new URL("beginner-village.json", directory), JSON.stringify(village, null, 2));
+await writeFile(new URL("beginner-village-art.json", directory), JSON.stringify(villageArt, null, 2));
+await writeFile(new URL("beginner-village-story.json", directory), `${JSON.stringify(story, null, 2)}\n`);
+console.log(
+  `beginner-village: ${villageArt.statistics.spriteStackCount} sprite stacks, collision changes ${villageArt.statistics.collisionChanges}`,
+);

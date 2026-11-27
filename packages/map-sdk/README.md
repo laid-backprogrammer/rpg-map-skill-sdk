@@ -1,6 +1,6 @@
 # @mossbrook/map-sdk
 
-不依赖 React、Canvas 或浏览器的 JavaScript / TypeScript 地图生成 SDK。先生成可通行骨架，再放置房屋、隔墙和家具，最后校验真实角色碰撞。内置散落村落、对称城镇、网格城镇，以及住宅、旅店、工坊室内模板。`0.3.0` 新增独立的分层美术规划接口 `createArtPlan`。
+不依赖 React、Canvas 或浏览器的 JavaScript / TypeScript 地图生成 SDK。先生成可通行骨架，再放置房屋、隔墙和家具，最后校验真实角色碰撞。内置散落村落、对称城镇、网格城镇，以及住宅、旅店、工坊室内模板。`0.3.0` 新增独立的分层美术规划接口 `createArtPlan`。`0.4.0` 让美术计划可以描述可选的精灵切片堆叠，且不改变碰撞。
 
 ## 快速使用
 
@@ -154,6 +154,7 @@ console.log(roomArt.statistics.collisionChanges); // 0
 | `groundDecals` | 地面细节矩形：`id/kind/x/y/width/height/alpha/parentId?` |
 | `contactShadows` | 软接触阴影矩形，`kind: "soft"`，`parentId` 指向所属实体 |
 | `decorations` | 渲染专用实体，均为 `solid: false`，包含图片范围、分层、透明度和所属组 |
+| `spriteStacks` | 可选的水平切片堆叠；空数组表示全部实体仍用单张精灵图 |
 | `statistics` | 各项数量、保护格数、采样器及过渡规则；`collisionChanges` 恒为 `0` |
 
 `transitions` 的位序为 `N, NE, E, SE, S, SW, W, NW`，分别对应 `1, 2, 4, 8, 16, 32, 64, 128`。只有同材质邻居才设位，地图外视为不匹配；对角位还要求相邻两个正交位同时存在。例如 `NE` 必须同时有 `N` 与 `E`。这是 47 型 Blob 邻接规则的掩码，**不是已完成的 47 张过渡贴图图集**；调用方仍需提供匹配素材、索引映射或边界绘制器。
@@ -165,6 +166,34 @@ console.log(roomArt.statistics.collisionChanges); // 0
 贴花 `kind` 包括 `foundation-dirt`、`moss`、`wear`、`crack`、`root-soil`、`leaf-litter`、`shore-wet`。矩形为地面绘制范围，`alpha` 在 `0..1`；不提供贴花图片。建筑组也可以仅通过带 `parentId` 的地面细节表达关系，而没有新增实体成员。
 
 装饰包含 `sprite/groupId/layer/foreground/opacity/visual`；`layer` 可为 `background/ground/entity/foreground`。`x/y/width/height` 是根部范围，`visual` 是独立图片范围，允许树冠重叠，不能拿图片包围盒当碰撞体。建议由引擎按根部脚点排序，并对人物被屋檐或树冠遮挡的情况做透明化。
+
+### 精灵切片堆叠
+
+树、塔、石、碑和建筑可以在计划里声明一叠水平切片，用来描述伪三维高度。不声明的实体保持单张精灵图。堆叠不进入 `decorations` 的采样，也不改变贴花、阴影或随机序列。
+
+```js
+const village = sdk.generateTown({ layout: "organic" });
+const tree = village.entities.find((entity) => entity.type === "tree");
+const art = createArtPlan(village, {
+  preset: "generic",
+  spriteStacks: [{ footprintId: tree.id, sliceCount: 6, spacing: 0.34 }],
+});
+console.log(art.spriteStacks[0].collision); // "footprint-only"
+console.log(art.spriteStacks[0].sortMode); // "world-foot-y"
+console.log(art.statistics.collisionChanges); // 0
+```
+
+| 输入 | 含义 |
+| --- | --- |
+| `footprintId` | 已有实体的 id。选项里的堆叠必须带它；写在实体 `spriteStack` 上时可省略 |
+| `sliceCount` | 含地面层，整数 `2..64` |
+| `spacing` | 统一的层间距，地图格。可改为 `slices[].spacing`，或只给 `height` 后均分 |
+| `height` | 脚平面到顶层的视觉高度，必须等于顶层标高 |
+| `pivot` | 占地内的归一化脚点，默认 `(0.5, 1)` |
+
+输出复制 `footprint`，计算 `foot` 与 `sortDepth`（等于 `foot.y`），并给每层 `index/elevation/spacing/sprite`。`spacingMode` 为 `uniform` 或 `per-slice`。`collision` 固定是 `footprint-only`。同一实体不能同时出现在选项和 `entity.spriteStack` 里。世界高度、屋檐和树冠都不会写回实体占地，也不会变成可行走掩码。引擎自行把 `elevation` 投影到屏幕，SDK 不绘制切片。
+
+仓库示例 `examples/beginner-village` 用现有 organic 布局给三棵树、水井和旅店写了堆叠，并附一段可阅读的序章。检查器里的 Beginner village 预设读取同一份数据。
 
 ### 预设范围
 

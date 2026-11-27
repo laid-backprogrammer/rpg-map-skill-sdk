@@ -1,6 +1,6 @@
 # SDK Operations And Boundaries
 
-This repository contains `@mossbrook/map-sdk` version `0.3.0` at `packages/map-sdk`. GitHub availability does not imply npm registry publication. In the checkout, use its documented package setup or `npm run sdk:pack` to obtain a local package archive.
+This repository contains `@mossbrook/map-sdk` version `0.4.0` at `packages/map-sdk`. GitHub availability does not imply npm registry publication. In the checkout, use its documented package setup or `npm run sdk:pack` to obtain a local package archive.
 
 ```js
 import {
@@ -75,6 +75,7 @@ Maximum dimensions are `101x101`. `corridorWidth` is odd and at least 3; wider c
 - `protected` marks art exclusion zones, not authoritative new walkability. Respect it alongside the original physical map.
 - `groundDecals` and `contactShadows` are drawing instructions without bitmap files.
 - `decorations` are `solid: false`, with separate root/visual ranges and group IDs. `collisionChanges` is 0.
+- `spriteStacks` is an opt-in list of horizontal slices for heighted props. Each stack cites an existing `footprintId`, with slice count, uniform or per-slice spacing, pivot, and world height. `sortMode` is `world-foot-y`. `collision` is `footprint-only`. Omit the stack to keep a single sprite. Stack height must not be copied into the entity footprint or walkability. The art-plan version string remains `1.0`; an empty `spriteStacks` array means no prop opted in.
 - `generic` and `plain` provide base planning and applicable details, not a finished forest composition. Both can contain decals and shadows.
 - The specialized `fangcun` cluster extension is active only for `sceneId === "courtyard"` and is authored for the original `60x36` courtyard geometry; merely adding that ID to an arbitrary map does not generalize it. Its scene-specific sprite keys/assets are not included in the public package. It samples group anchors and then members using `poisson-disk-sampling`. Do not label this a generic automatic landscape generator.
 

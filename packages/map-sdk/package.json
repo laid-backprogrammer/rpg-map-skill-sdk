@@ -1,6 +1,6 @@
 {
   "name": "@mossbrook/map-sdk",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Deterministic, connectivity-verified 2D towns and building interiors.",
   "type": "module",
   "main": "./src/index.js",

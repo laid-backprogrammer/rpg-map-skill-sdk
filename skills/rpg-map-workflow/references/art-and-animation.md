@@ -16,6 +16,8 @@ sortDepth = footWorldUnits.y
 
 Asset pixel anchors are not SDK `Entity.anchor` values. SDK `visual.offsetX/offsetY/width/height` are map units. Convert once in the engine adapter. Roof/canopy occlusion is a rendering rule; it must not change collision or silently reveal hidden story objects.
 
+Sprite stacking is optional art-plan data, not a renderer. A stack's slice count, spacing, pivot, and world height describe horizontal slices. Depth sorting stays on the world foot cited by the footprint. The engine may offset slices in screen space; this SDK does not. Stack volume never becomes a hitbox.
+
 ## Directional Walk Sheets
 
 Choose four or eight directions from the game's camera and input model. Give every direction the same frame count, fixed canvas, anchor, scale, light source, costume, and cycle phase. A baseline eight-frame loop is: left contact, left down, left passing, left up/right precontact, right contact, right down, right passing, right up/left precontact. Angles change the projected silhouette, not the phase definition.

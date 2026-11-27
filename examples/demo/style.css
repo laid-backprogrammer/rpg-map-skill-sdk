@@ -48,6 +48,10 @@ canvas { display: block; width: 100%; touch-action: manipulation; cursor: crossh
 .route { background: #1462ca; }
 output { font-variant-numeric: tabular-nums; }
 .inspector { border-left: 1px solid var(--border); padding: 23px 0 0 22px; min-width: 0; }
+.story h3 { margin-top: 0; }
+.story p, .story li { margin: 0; font-size: 12px; font-weight: 400; color: #252c34; }
+.story ol { margin: 8px 0 18px; padding-left: 18px; display: grid; gap: 8px; }
+.story .beat-zh { display: block; margin-top: 2px; color: var(--muted); }
 .report-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 h2 { font-size: 15px; margin: 0; }
 h3 { font-size: 12px; margin: 22px 0 9px; color: #54606c; font-weight: 700; }

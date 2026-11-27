@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.0
+
+- Art plans can describe opt-in sprite stacks for heighted props. A stack records
+  slice count, uniform or per-slice spacing, pivot, world height, and the
+  existing ground footprint. Depth sorting stays on the world foot. Stack
+  height does not change collision, navigation, door clearance, or walkability.
+  Props without a stack remain single sprites. `statistics.collisionChanges`
+  stays 0. The art-plan version string remains `1.0`.
+- Added an inspectable beginner-village example on the organic town. It stacks
+  sample trees, the village well, and the wayfarer lodge, and includes a short
+  prologue. The physical layout is unchanged.
+
 ## 0.3.0 - First Public Release
 
 - Extracted the existing renderer-independent map SDK into a standalone repository.

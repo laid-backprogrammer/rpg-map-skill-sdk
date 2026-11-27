@@ -21,6 +21,7 @@
           <select id="preset" name="preset">
             <optgroup label="Towns">
               <option value="organic">Organic town</option>
+              <option value="beginner-village">Beginner village</option>
               <option value="symmetric">Symmetric town</option>
               <option value="grid">Grid town</option>
             </optgroup>
@@ -83,6 +84,11 @@
           </div>
         </section>
         <aside class="inspector" aria-label="Validation report">
+          <section id="story" class="story" hidden>
+            <h3>Starter story</h3>
+            <p id="story-summary"></p>
+            <ol id="story-beats"></ol>
+          </section>
           <div class="report-heading"><h2>Validation</h2><output id="result" class="result">Pending</output></div>
           <dl id="metrics" class="metrics"></dl>
           <h3>Portals</h3>

@@ -13,7 +13,8 @@ and a renderer-independent JavaScript / TypeScript SDK.
 - **地图制作 Skill**：布局约束、算法验证、分层素材、Agent 协作与验收。
 - **地图 SDK**：散落村镇、对称城镇、网格城镇，以及住宅、旅店、工坊室内。
 - **四向出口与内外关联**：出口、房屋门口、家具交互点都要通过真实角色净空验证。
-- **美术计划**：Blob 邻接掩码、距离场、保护区、地面贴花与接触阴影数据。
+- **美术计划**：Blob 邻接掩码、距离场、保护区、地面贴花、接触阴影，以及可选的精灵切片堆叠。堆叠只描述高度，不改变碰撞。
+- **新手村示例**：复用 organic 布局，给树、水井和旅店写切片堆叠，并附一段可阅读的序章。见 [examples/beginner-village/README.md](examples/beginner-village/README.md)。
 - **可运行示例**：切换六种预设，查看碰撞框、最大可走矩形和点击寻路，下载 JSON。
 - **可选原声视频 Skill**：不改原稿和录音，用 GSAP 时间轴细化运镜、转场与音效。
 
@@ -49,10 +50,10 @@ npm run validate -- --input output/city.json
 
 ## 在游戏中使用 SDK
 
-克隆后可以安装 `packages/map-sdk`，或先运行 `npm run sdk:pack`，把 `output/mossbrook-map-sdk-0.3.0.tgz` 安装到目标工程：
+克隆后可以安装 `packages/map-sdk`，或先运行 `npm run sdk:pack`，把 `output/mossbrook-map-sdk-0.4.0.tgz` 安装到目标工程：
 
 ```sh
-npm install /path/to/mossbrook-map-sdk-0.3.0.tgz
+npm install /path/to/mossbrook-map-sdk-0.4.0.tgz
 ```
 
 也可以从 [GitHub Release](https://github.com/laid-backprogrammer/rpg-map-skill-sdk/releases) 下载同名安装包。**尚未发布 npm 注册表**，不要直接假设 `npm install @mossbrook/map-sdk` 可以联网安装。
@@ -115,6 +116,8 @@ console.log(art.statistics.collisionChanges); // 0
 | 最大矩形 | 栅格中心容量参考；不是房屋打包或连续无障碍区域的证明 |
 | 寻路 | PathFinding.js 的 A*，连通验证和沿边圆形角色碰撞检查 |
 | 美术 | 输出数据，不生成图片或实现引擎的脚点排序/遮挡透明化 |
+| 切片堆叠 | 可选的层数、间距、枢轴、世界高度和已有占地；碰撞仍是二维占地 |
+| 新手村 | `examples/beginner-village` 与检查器预设；物理布局仍是 organic |
 | 泊松配景 | 当前完整簇配景只在 `fangcun` + `sceneId:"courtyard"` 专用场景启用；`generic/plain` 不新增大型配景 |
 | AI / 视频 | 外部可选工具；不自带供应商、密钥、GSAP 或 HyperFrames 运行时 |
 

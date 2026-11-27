@@ -1,6 +1,7 @@
 import { SDK_VERSION, createArtPlan, findPath, validateMap } from '../../packages/map-sdk/src/index.js';
 import { PRESETS, generatePreset } from './presets.js';
 import { COLORS, tileColor } from './paint.js';
+import { artOptionsFor, storyFor } from '../beginner-village/village.js';
 
 const node = (id) => document.getElementById(id);
 const canvas = node('map');
@@ -159,14 +160,46 @@ function renderReport() {
   node('issues').textContent = report.issues.join(' ');
   const artMetrics = node('art-metrics'); artMetrics.replaceChildren();
   addMetric(artMetrics, 'Protected cells', art.statistics.protectedCellCount);
+  addMetric(artMetrics, 'Sprite stacks', art.statistics.spriteStackCount);
   addMetric(artMetrics, 'Decoration points', art.statistics.decorationCount);
   addMetric(artMetrics, 'Groups', art.statistics.groupCount);
   addMetric(artMetrics, 'Ground decals', art.statistics.decalCount);
   addMetric(artMetrics, 'Collision changes', art.statistics.collisionChanges);
 }
 
+function renderStory(map) {
+  const section = node('story');
+  const show = node('preset').value === 'beginner-village';
+  section.hidden = !show;
+  node('story-summary').replaceChildren();
+  node('story-beats').replaceChildren();
+  if (!show || !map) return;
+  const story = storyFor(map);
+  const summary = document.createElement('span');
+  summary.textContent = story.summary;
+  const summaryZh = document.createElement('span');
+  summaryZh.className = 'beat-zh';
+  summaryZh.textContent = story.summaryZh;
+  node('story-summary').append(summary, summaryZh);
+  for (const beat of story.beats) {
+    const item = document.createElement('li');
+    const title = document.createElement('span');
+    title.textContent = `${beat.title}. `;
+    const body = document.createElement('span');
+    body.textContent = beat.reachable
+      ? beat.text
+      : `${beat.text} This beat's anchor is not on the current map.`;
+    const zh = document.createElement('span');
+    zh.className = 'beat-zh';
+    zh.textContent = beat.textZh;
+    item.append(title, body, zh);
+    node('story-beats').append(item);
+  }
+}
+
 function clearResult(error) {
   state = { map: null, art: null, route: [], target: null, destinations: [] };
+  node('story').hidden = true;
   node('error').textContent = error.message || String(error); node('error').hidden = false;
   node('result').textContent = 'ERROR'; node('result').dataset.passed = 'false';
   for (const id of ['metrics', 'portals', 'art-metrics']) node(id).replaceChildren();
@@ -183,15 +216,19 @@ function generate() {
   try {
     const seed = node('seed').value.trim();
     if (!seed) throw new TypeError('Seed cannot be empty.');
-    const map = generatePreset(node('preset').value, seed, node('symmetry').value);
+    const preset = node('preset').value;
+    const map = generatePreset(preset, seed, node('symmetry').value);
     map.report = validateMap(map);
-    const art = createArtPlan(map, { seed, preset: 'generic' });
+    const art = createArtPlan(map, preset === 'beginner-village'
+      ? artOptionsFor(map, seed)
+      : { seed, preset: 'generic' });
     state = { map, art, route: [], target: null, destinations: [] };
     node('error').hidden = true;
     node('route-status').textContent = 'No target'; node('route-status').removeAttribute('data-reachable');
     node('coordinates').textContent = `${map.width} x ${map.height} cells`;
     canvas.setAttribute('aria-label', `${map.kind} blockout, ${map.width} by ${map.height} cells. Validation ${map.report.passed ? 'passed' : 'failed'}.`);
     node('download-map').disabled = false; node('download-art').disabled = false;
+    renderStory(map);
     renderReport(); draw();
   } catch (error) { clearResult(error); }
   finally { button.disabled = false; }
