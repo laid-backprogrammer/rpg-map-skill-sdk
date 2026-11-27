@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Beginner village · HD-2D</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./scene.css">
+    <script src="./scene.js" type="module"></script>
+  </head>
+  <body>
+    <canvas id="view" aria-label="HD-2D beginner village. Drag to orbit the camera."></canvas>
+    <div class="hud">
+      <a href="./index.html">Blockout</a>
+      <span class="title">Beginner village · HD-2D</span>
+      <button id="story-toggle" type="button" aria-pressed="false">Story</button>
+      <button id="footprints" type="button" aria-pressed="false">Footprints</button>
+      <button id="reset" type="button">Reset camera</button>
+      <span class="hint">Drag orbit · right-drag pan · scroll zoom</span>
+    </div>
+    <aside id="story" class="story" hidden></aside>
+    <div id="loading">Painting the village…</div>
+  </body>
+</html>

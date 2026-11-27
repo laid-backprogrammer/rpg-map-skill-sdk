@@ -13,6 +13,9 @@
   prologue. The physical layout is unchanged.
 - The blockout inspector can preview those stacks as placeholder slices with a
   tilt control. The preview does not change collision or navigation.
+- `npm run demo` also serves an HD-2D village scene at `/scene.html`. Painted
+  slices of the oak, well, and lodge are stacked on the organic footprints
+  under a warm orbit camera. Other houses reuse the lodge slices.
 
 ## 0.3.0 - First Public Release
 

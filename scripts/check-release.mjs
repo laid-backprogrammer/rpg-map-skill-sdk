@@ -15,8 +15,10 @@ async function scan(directory) {
     if ((await lstat(path)).isSymbolicLink()) { failures.push(`${name}: symlink`); continue; }
     if (entry.isDirectory()) { await scan(path); continue; }
     files += 1;
-    if (!allowed.has(extname(path)) && !["LICENSE", ".gitignore"].includes(entry.name))
+    const exampleArt = name.startsWith("examples/beginner-village/assets/") && [".png", ".jpg", ".jpeg"].includes(extname(path));
+    if (!allowed.has(extname(path)) && !exampleArt && !["LICENSE", ".gitignore"].includes(entry.name))
       failures.push(`${name}: unexpected file type`);
+    if (exampleArt) continue;
     const content = await readFile(path, "utf8");
     const patterns = [
       ["credential", /(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|sk-(?:proj-)?[A-Za-z0-9_-]{24,}|-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----)/],

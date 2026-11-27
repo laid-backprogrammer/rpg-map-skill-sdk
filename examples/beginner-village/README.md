@@ -4,7 +4,7 @@
 
 在检查器里选择 **Beginner village**，或运行 `npm run examples`，查看 `output/sdk-examples/beginner-village.json`、`beginner-village-art.json` 和 `beginner-village-story.json`。
 
-`npm run demo` 打开同一张图。勾选 **Sprite stacks** 后，三棵树、水井和旅店会按美术计划里的层数、间距、枢轴和高度画成斜俯的占位切片。**Tilt** 改变抬升角度；设成 `0` 就是正俯视，切片叠在占地上面。关掉 **Sprite stacks** 回到原来的俯视 blockout。碰撞框、出口、路线和这篇序章都还在。这些色块不是正式图片，也不写入地图。
+`npm run demo` 会同时打开俯视检查器和 HD-2D 场景。页眉的 **HD-2D scene**，或地址栏的 `/scene.html`，进入可环绕的序章村子：暖色光、接触阴影、轻微辉光。树、水井和旅店用抠好的水平切片叠在真实占地上；其他房屋复用旅店切片。**Footprints** 默认关闭。**Story** 可以打开这篇序章。碰撞和寻路数据没有改。检查器里的 **Sprite stacks** 仍是占位色块，用来对照合同，不是这张场景。
 
 ## 故事
 
