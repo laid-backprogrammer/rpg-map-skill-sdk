@@ -7,10 +7,13 @@ import { sceneProps } from "../examples/demo/scene-layout.js";
 
 test("HD-2D placement uses painted stacks without moving the organic village", async () => {
   const manifest = JSON.parse(await readFile(new URL("../examples/beginner-village/assets/stacks.json", import.meta.url), "utf8"));
+  const expected = { oak: [2.3, 2.5], well: [1.6, 1.85], lodge: [3.15, 3.45] };
   for (const kind of ["oak", "well", "lodge"]) {
-    assert.equal(manifest[kind].files.length, 8);
-    assert.ok(manifest[kind].spacing > 0 && manifest[kind].plane > 0);
-    for (const file of manifest[kind].files)
+    assert.ok(manifest[kind].files.length >= 32 && manifest[kind].files.length <= 48);
+    assert.ok(manifest[kind].spacing >= 0.045 && manifest[kind].spacing <= 0.08);
+    const height = 0.05 + (manifest[kind].files.length - 1) * manifest[kind].spacing;
+    assert.ok(height >= expected[kind][0] && height <= expected[kind][1], `${kind} height ${height}`);
+    for (const file of new Set(manifest[kind].files))
       await access(new URL(`../examples/beginner-village/assets/${file}`, import.meta.url));
   }
   const map = generateTown({ layout: "organic", seed: 1042 });

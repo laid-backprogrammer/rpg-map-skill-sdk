@@ -4,7 +4,7 @@
 
 在检查器里选择 **Beginner village**，或运行 `npm run examples`，查看 `output/sdk-examples/beginner-village.json`、`beginner-village-art.json` 和 `beginner-village-story.json`。
 
-`npm run demo` 会同时打开俯视检查器和 HD-2D 场景。页眉的 **HD-2D scene**，或地址栏的 `/scene.html`，进入可环绕的序章村子：暖色光、接触阴影、轻微辉光。树、水井和旅店用抠好的水平切片叠在真实占地上；其他房屋复用旅店切片。**Footprints** 默认关闭。**Story** 可以打开这篇序章。碰撞和寻路数据没有改。检查器里的 **Sprite stacks** 仍是占位色块，用来对照合同，不是这张场景。
+`npm run demo` 会同时打开俯视检查器和 HD-2D 场景。页眉的 **HD-2D scene**，或地址栏的 `/scene.html`，进入可环绕的序章村子。场景里的树、水井和旅店是大约 34–44 层的细切片，间距大约 0.05–0.08，所以从默认的四分之三视角看起来是实心的画，不是拉开的楼板。其他房屋复用旅店切片。**Footprints** 默认关闭。**Story** 可以打开这篇序章。碰撞和寻路数据没有改。检查器里的 **Sprite stacks** 仍是占位色块，用来对照合同。
 
 ## 故事
 

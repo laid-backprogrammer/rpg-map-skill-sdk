@@ -15,7 +15,9 @@
   tilt control. The preview does not change collision or navigation.
 - `npm run demo` also serves an HD-2D village scene at `/scene.html`. Painted
   slices of the oak, well, and lodge are stacked on the organic footprints
-  under a warm orbit camera. Other houses reuse the lodge slices.
+  under a warm orbit camera. Other houses reuse the lodge slices. Those
+  preview stacks are dense (about 34–44 thin courses) so the props read as
+  solid forms. The art-plan contract itself stays a short opt-in description.
 
 ## 0.3.0 - First Public Release
 

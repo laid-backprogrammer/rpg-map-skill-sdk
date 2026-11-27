@@ -10,8 +10,8 @@ import { STORY } from "../beginner-village/village.js";
 import { sceneProps } from "./scene-layout.js";
 
 const HOME = {
-  position: new THREE.Vector3(15.2, 8.6, 31.4),
-  target: new THREE.Vector3(23.4, 1.15, 14.2),
+  position: new THREE.Vector3(17.6, 4.4, 26.8),
+  target: new THREE.Vector3(23.6, 1.2, 14.4),
 };
 const node = (id) => document.getElementById(id);
 
@@ -146,9 +146,16 @@ async function main() {
     loadImage("./assets/source/ground-concept.jpg"),
   ]);
   const loader = new THREE.TextureLoader();
+  const materialCache = new Map();
+  const materialFor = async (file) => {
+    if (!materialCache.has(file)) {
+      materialCache.set(file, sliceMaterial(await loader.loadAsync(`./assets/${file}`)));
+    }
+    return materialCache.get(file);
+  };
   const materials = {};
   for (const [kind, spec] of Object.entries(manifest)) {
-    materials[kind] = await Promise.all(spec.files.map(async (file) => sliceMaterial(await loader.loadAsync(`./assets/${file}`))));
+    materials[kind] = await Promise.all(spec.files.map((file) => materialFor(file)));
   }
 
   const canvas = node("view");
@@ -165,7 +172,7 @@ async function main() {
   scene.background = new THREE.Color(0xf0e0c6);
   scene.fog = new THREE.FogExp2(0xead8bc, 0.0065);
   const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.08, 180);
-  const introFrom = HOME.position.clone().add(new THREE.Vector3(-8, 7, 8));
+  const introFrom = HOME.position.clone().add(new THREE.Vector3(-4, 1.6, 5));
   camera.position.copy(introFrom);
 
   const controls = new OrbitControls(camera, canvas);
@@ -229,8 +236,8 @@ async function main() {
       const slice = new THREE.Mesh(sliceGeometry, material);
       slice.scale.set(width, 1, depth);
       slice.position.y = 0.05 + index * spec.spacing;
-      slice.castShadow = true;
-      slice.receiveShadow = true;
+      slice.castShadow = false;
+      slice.receiveShadow = false;
       group.add(slice);
     });
     const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
