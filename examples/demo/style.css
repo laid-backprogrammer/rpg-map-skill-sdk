@@ -46,6 +46,9 @@ canvas { display: block; width: 100%; touch-action: manipulation; cursor: crossh
 .collider { background: #a7654a; }
 .rectangle { border: 2px solid #b32370; }
 .route { background: #1462ca; }
+.stack { background: #2f7a45; border-radius: 50%; }
+.tilt { flex-direction: row; align-items: center; gap: 8px; }
+.tilt input { width: 108px; min-height: 0; padding: 0; accent-color: var(--accent); }
 output { font-variant-numeric: tabular-nums; }
 .inspector { border-left: 1px solid var(--border); padding: 23px 0 0 22px; min-width: 0; }
 .story h3 { margin-top: 0; }

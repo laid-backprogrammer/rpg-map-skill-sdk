@@ -4,6 +4,8 @@
 
 在检查器里选择 **Beginner village**，或运行 `npm run examples`，查看 `output/sdk-examples/beginner-village.json`、`beginner-village-art.json` 和 `beginner-village-story.json`。
 
+`npm run demo` 打开同一张图。勾选 **Sprite stacks** 后，三棵树、水井和旅店会按美术计划里的层数、间距、枢轴和高度画成斜俯的占位切片。**Tilt** 改变抬升角度；设成 `0` 就是正俯视，切片叠在占地上面。关掉 **Sprite stacks** 回到原来的俯视 blockout。碰撞框、出口、路线和这篇序章都还在。这些色块不是正式图片，也不写入地图。
+
 ## 故事
 
 你沿南边的土路走进村子，停在通向广场的路口。前面是水井，东北方向是客栈的屋顶。屋顶和水井看起来更高，路还是原来那条。

@@ -40,6 +40,8 @@ npm run demo
 npm run demo -- --port 5188
 ```
 
+检查器里选择 **Beginner village**。**Sprite stacks** 会把树、水井和旅店画成占位切片，**Tilt** 调节斜俯角度。这个预览不改变碰撞；关掉开关就是原来的俯视 blockout。
+
 生成四出口城镇和室内：
 
 ```sh

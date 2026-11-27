@@ -191,9 +191,9 @@ console.log(art.statistics.collisionChanges); // 0
 | `height` | 脚平面到顶层的视觉高度，必须等于顶层标高 |
 | `pivot` | 占地内的归一化脚点，默认 `(0.5, 1)` |
 
-输出复制 `footprint`，计算 `foot` 与 `sortDepth`（等于 `foot.y`），并给每层 `index/elevation/spacing/sprite`。`spacingMode` 为 `uniform` 或 `per-slice`。`collision` 固定是 `footprint-only`。同一实体不能同时出现在选项和 `entity.spriteStack` 里。世界高度、屋檐和树冠都不会写回实体占地，也不会变成可行走掩码。引擎自行把 `elevation` 投影到屏幕，SDK 不绘制切片。
+输出复制 `footprint`，计算 `foot` 与 `sortDepth`（等于 `foot.y`），并给每层 `index/elevation/spacing/sprite`。`spacingMode` 为 `uniform` 或 `per-slice`。`collision` 固定是 `footprint-only`。同一实体不能同时出现在选项和 `entity.spriteStack` 里。世界高度、屋檐和树冠都不会写回实体占地，也不会变成可行走掩码。引擎自行把 `elevation` 投影到屏幕。SDK 包不绘制切片。
 
-仓库示例 `examples/beginner-village` 用现有 organic 布局给三棵树、水井和旅店写了堆叠，并附一段可阅读的序章。检查器里的 Beginner village 预设读取同一份数据。
+仓库示例 `examples/beginner-village` 用现有 organic 布局给三棵树、水井和旅店写了堆叠，并附一段可阅读的序章。`npm run demo` 里的 Beginner village 预设用占位色块预览这些切片；**Tilt** 只影响预览角度。
 
 ### 预设范围
 

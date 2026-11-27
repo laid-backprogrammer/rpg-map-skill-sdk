@@ -1,6 +1,7 @@
 import { SDK_VERSION, createArtPlan, findPath, validateMap } from '../../packages/map-sdk/src/index.js';
 import { PRESETS, generatePreset } from './presets.js';
 import { COLORS, tileColor } from './paint.js';
+import { drawSpriteStacks } from './stacks.js';
 import { artOptionsFor, storyFor } from '../beginner-village/village.js';
 
 const node = (id) => document.getElementById(id);
@@ -9,6 +10,7 @@ const context = canvas.getContext('2d');
 const controls = {
   view: node('view'), colliders: node('colliders'), rectangle: node('rectangle'),
   decorations: node('decorations'), grid: node('grid-lines'),
+  stacks: node('stacks'), tilt: node('tilt'),
 };
 let state = { map: null, art: null, route: [], target: null, destinations: [] };
 let geometry = { left: 0, top: 0, unit: 1 };
@@ -21,11 +23,23 @@ function addMetric(list, label, value) {
   list.append(term, definition);
 }
 
+function stackTilt() {
+  const value = Number(controls.tilt.value);
+  return Number.isFinite(value) ? Math.max(0, value) : 0;
+}
+
+function showStacks() {
+  return Boolean(controls.stacks.checked && state.art?.spriteStacks?.length);
+}
+
 function draw() {
   const width = canvas.parentElement.clientWidth;
   if (!width) return;
   const map = state.map;
-  const height = map ? Math.min(640, Math.max(260, (width - 32) * map.height / map.width + 32)) : 350;
+  const tilt = stackTilt();
+  const riseCells = showStacks() ? Math.max(...state.art.spriteStacks.map((stack) => stack.height)) * tilt + 2 : 0;
+  const contentHeight = map ? map.height + riseCells : 1;
+  const height = map ? Math.min(760, Math.max(260, (width - 32) * contentHeight / map.width + 32)) : 350;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = Math.round(width * dpr);
   canvas.height = Math.round(height * dpr);
@@ -35,8 +49,10 @@ function draw() {
   context.fillStyle = '#f6f8fa';
   context.fillRect(0, 0, width, height);
   if (!map) return;
-  const unit = Math.min((width - 32) / map.width, (height - 32) / map.height);
-  geometry = { left: (width - map.width * unit) / 2, top: (height - map.height * unit) / 2, unit };
+  const unit = Math.min((width - 32) / map.width, (height - 32) / contentHeight);
+  const risePixels = riseCells * unit;
+  const used = risePixels + map.height * unit;
+  geometry = { left: (width - map.width * unit) / 2, top: Math.max(16, (height - used) / 2) + risePixels, unit };
   const { left, top } = geometry;
   context.save();
   context.translate(left, top);
@@ -59,12 +75,17 @@ function draw() {
       context.fillRect(point.x * unit - 1.4, point.y * unit - 1.4, 2.8, 2.8);
     }
   }
+  const stackedIds = showStacks() ? new Set(state.art.spriteStacks.map((stack) => stack.footprintId)) : new Set();
+  if (stackedIds.size) drawSpriteStacks(context, state.art.spriteStacks, unit, tilt);
   if (controls.colliders.checked) {
     for (const entity of map.entities.filter((item) => item.solid)) {
-      context.fillStyle = COLORS.entity;
+      const stacked = stackedIds.has(entity.id);
       context.strokeStyle = COLORS.collider;
       context.lineWidth = 1;
-      context.fillRect(entity.x * unit, entity.y * unit, entity.width * unit, entity.height * unit);
+      if (!stacked) {
+        context.fillStyle = COLORS.entity;
+        context.fillRect(entity.x * unit, entity.y * unit, entity.width * unit, entity.height * unit);
+      }
       context.strokeRect(entity.x * unit, entity.y * unit, entity.width * unit, entity.height * unit);
     }
   }
@@ -251,7 +272,12 @@ node('preset').addEventListener('change', () => {
   generate();
 });
 node('symmetry').addEventListener('change', generate);
-for (const control of Object.values(controls)) control.addEventListener('change', draw);
+function syncTilt() {
+  controls.tilt.disabled = !controls.stacks.checked;
+}
+for (const control of Object.values(controls)) control.addEventListener('change', () => { syncTilt(); draw(); });
+controls.tilt.addEventListener('input', draw);
+syncTilt();
 node('target').addEventListener('change', () => {
   const destination = state.destinations.find((item) => item.key === node('target').value);
   if (destination) selectTarget(destination.point, destination.label);

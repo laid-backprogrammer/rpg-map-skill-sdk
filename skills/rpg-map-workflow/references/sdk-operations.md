@@ -96,4 +96,4 @@ npm run demo
 npm run sdk:pack
 ```
 
-Command availability belongs to the repository checkout, not to an independently installed skill folder. Inspect the package scripts if the project differs.
+Command availability belongs to the repository checkout, not to an independently installed skill folder. Inspect the package scripts if the project differs. `npm run demo` can preview `spriteStacks` as placeholder slices with a tilt control. That preview is not a game renderer and does not change collision.

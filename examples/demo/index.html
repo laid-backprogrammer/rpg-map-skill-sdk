@@ -65,6 +65,10 @@
               </select>
             </label>
             <label class="check"><input id="colliders" type="checkbox" checked> Physical boxes</label>
+            <label class="check" title="Placeholder slices from the art plan. This does not change collision."><input id="stacks" type="checkbox" checked> Sprite stacks</label>
+            <label class="tilt">Tilt
+              <input id="tilt" type="range" min="0" max="1.6" step="0.05" value="1.05" aria-label="Stack tilt">
+            </label>
             <label class="check"><input id="rectangle" type="checkbox" checked> Max rectangle</label>
             <label class="check"><input id="decorations" type="checkbox"> Art points</label>
             <label class="check"><input id="grid-lines" type="checkbox"> Grid</label>
@@ -79,6 +83,7 @@
               <span><i class="swatch collider"></i>Solid</span>
               <span><i class="swatch rectangle"></i>Max rectangle</span>
               <span><i class="swatch route"></i>A* route</span>
+              <span><i class="swatch stack"></i>Stack slice</span>
             </div>
             <output id="coordinates">No target</output>
           </div>

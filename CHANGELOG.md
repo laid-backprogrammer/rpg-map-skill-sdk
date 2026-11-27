@@ -11,6 +11,8 @@
 - Added an inspectable beginner-village example on the organic town. It stacks
   sample trees, the village well, and the wayfarer lodge, and includes a short
   prologue. The physical layout is unchanged.
+- The blockout inspector can preview those stacks as placeholder slices with a
+  tilt control. The preview does not change collision or navigation.
 
 ## 0.3.0 - First Public Release
 
